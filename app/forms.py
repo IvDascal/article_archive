@@ -54,3 +54,24 @@ class UserEditForm(FlaskForm):
     def validate_username(self, field):
         if field.data != self.user.username and \
                 User.query.filter_by(username=field.data).first(): raise ValidationError('Username already in use.')
+
+
+class SourceCreateForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    sid = StringField('SID', validators=[DataRequired()])
+    url = StringField('URL', validators=[DataRequired()])
+    is_active = BooleanField('Active', default="checked")
+    submit = SubmitField('Create')
+
+
+class SourceEditForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    sid = StringField('SID', validators=[DataRequired()])
+    url = StringField('URL', validators=[DataRequired()])
+    is_active = BooleanField('Active', default="checked")
+    submit = SubmitField('Edit')
+
+    def __init__(self, source, *args, **kwargs):
+        super(SourceEditForm, self).__init__(*args, **kwargs)
+
+        self.source = source

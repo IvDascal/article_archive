@@ -3,8 +3,8 @@ from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
 from app import app, db
-from app.forms import LoginForm, UserCreateForm, UserEditForm
-from app.models import User, Role
+from app.forms import LoginForm, UserCreateForm, UserEditForm, SourceCreateForm, SourceEditForm
+from app.models import User, Role, Source
 
 
 @app.route('/')
@@ -115,3 +115,70 @@ def delete_user(id):
     # TODO success  or error message
 
     return redirect(url_for('users'))
+
+
+@app.route('/source/<int:id>')
+def source(id):
+    source = Source.query.get(id)
+
+    return render_template('source_detail.html', source=source)
+
+
+@app.route('/sources')
+def sources():
+    sources = Source.query.all()
+
+    return render_template('sources.html', sources=sources)
+
+
+@app.route('/source_create', methods=['GET', 'POST'])
+def source_create():
+    form = SourceCreateForm()
+    if form.validate_on_submit():
+        source = Source()
+        source.sid = form.sid.data
+        source.name = form.name.data
+        source.url = form.url.data
+
+        db.session.add(source)
+        db.session.commit()
+
+        return redirect(url_for('sources'))
+
+    return render_template('source_create.html', form=form)
+
+
+@app.route('/source_edit/<int:id>', methods=['GET', 'POST'])
+def source_edit(id):
+    source = Source.query.get(id)
+    form = SourceEditForm(source=source)
+
+    if form.validate_on_submit():
+        source.sid = form.sid.data
+        source.name = form.name.data
+        source.url = form.url.data
+
+        db.session.add(source)
+        db.session.commit()
+
+        return redirect(url_for('source', id=source.id))
+
+    form.sid.data = source.sid
+    form.name.data = source.name
+    form.url.data = source.url
+
+    return render_template('source_edit.html', form=form)
+
+
+@app.route('/source_delete/<int:id>')
+def source_delete(id):
+    source = Source.query.get(id)
+    source.is_active = False
+
+    db.session.add(source)
+    db.session.commit()
+
+    # TODO delete confirmation to avoid misclick
+    # TODO success  or error message
+
+    return redirect(url_for('sources'))

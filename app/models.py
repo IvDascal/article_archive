@@ -51,3 +51,19 @@ class User(UserMixin, db.Model):
 @login.user_loader
 def load_user(id):
     return User.query.get(int(id))
+
+
+class Source(db.Model):
+    __tablename__ = 'source'
+
+    id = db.Column(db.Integer, primary_key=True)
+    sid = db.Column(db.String(256), unique=True)
+    name = db.Column(db.String(256), unique=True)
+    url = db.Column(db.String(2048)) #TODO need url validator
+    is_active = db.Column(db.Boolean, default=True)
+
+    def __repr__(self):
+        return '<Source {}>'.format(self.name)
+
+    def __str__(self):
+        return 'Source: {} --- {}'.format(self.id, self.name)

@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <a href="{{ url_for('source_create') }}">Create Source</a>
+    <ul>
+        {% for source in sources %}
+            <li>
+                <a href="{{ url_for('source', id=source.id) }}">{{ source.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
