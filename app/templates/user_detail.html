@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>{{ user.username }}</h1>
+        <p>Email: {{ user.email }}</p>
+        <p>Is user active: {% if user.is_active %} Yes {% else %} No {% endif %}</p>
+        <p>Role: {{ user.role.name }}</p>
+    </div>
+    <a href="{{ url_for('edit_user', id=user.id) }}">Edit</a>
+    <a href="{{ url_for('delete_user', id=user.id ) }}">Delete</a>
+{% endblock %}
