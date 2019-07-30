@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block app_content %}
     <a href="{{ url_for('document_create') }}">Create Document</a>
     <ul>
         {% for document in documents %}
