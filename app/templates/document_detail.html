@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="page-header">
+        <h1>{{ document.title }}</h1>
+        <p>URL: {{ document.url }}</p>url
+        <p>DATE: {{ document.created }}</p>
+        <p>SOURCE: {{ document.source.name }}</p>
+        <p>AUTHOR: {{ document.user.username }}</p>
+        <p>TEXT: {{ document.text }}</p>
+    </div>
+    <a href="{{ url_for('document_edit', id=document.id) }}">Edit</a>
+    <a href="{{ url_for('document_delete', id=document.id ) }}">Delete</a>
+{% endblock %}

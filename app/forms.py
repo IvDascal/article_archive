@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField
-from wtforms.validators import DataRequired, EqualTo, Email, ValidationError
+from wtforms import StringField, PasswordField, BooleanField, SubmitField, SelectField, TextAreaField, DateTimeField
+from wtforms.validators import DataRequired, EqualTo, Email, ValidationError, URL
 
-from app.models import Role, User
+from app.models import Role, User, Source
 
 
 class LoginForm(FlaskForm):
@@ -75,3 +75,37 @@ class SourceEditForm(FlaskForm):
         super(SourceEditForm, self).__init__(*args, **kwargs)
 
         self.source = source
+
+
+class DocumentCreateForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    text = TextAreaField('Text', validators=[DataRequired()])
+    url = StringField('URL', validators=[DataRequired(), URL()])
+    created = DateTimeField('Created')
+    source = SelectField('Source', coerce=int)
+    user = SelectField('User', coerce=int)
+    submit = SubmitField('Create')
+
+    def __init__(self, *args, **kwargs):
+        super(DocumentCreateForm, self).__init__(*args, **kwargs)
+
+        self.source.choices = [(source.id, source.name) for source in Source.query.order_by(Source.name).all()]
+        self.user.choices = [(user.id, user.username) for user in User.query.order_by(User.username).all()]
+
+
+class DocumentEditForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    text = TextAreaField('Text', validators=[DataRequired()])
+    url = StringField('URL', validators=[DataRequired(), URL()])
+    created = DateTimeField('Created')
+    source = SelectField('source', coerce=int)
+    user = SelectField('User', coerce=int)
+    submit = SubmitField('Create')
+
+    def __init__(self, document,  *args, **kwargs):
+        super(DocumentEditForm, self).__init__(*args, **kwargs)
+
+        self.source.choices = [(source.id, source.name) for source in Source.query.order_by(Source.name).all()]
+        self.user.choices = [(user.id, user.username) for user in User.query.order_by(User.username).all()]
+
+        self.document = document

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -27,6 +29,8 @@ class User(UserMixin, db.Model):
     password_hash = db.Column(db.String(128))
     is_active = db.Column(db.Boolean, default=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+
+    document = db.relationship('Document', backref='user')
 
     # json field? - дополнительные сопутствующие поля если нужно
 
@@ -59,11 +63,26 @@ class Source(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sid = db.Column(db.String(256), unique=True)
     name = db.Column(db.String(256), unique=True)
-    url = db.Column(db.String(2048)) #TODO need url validator
+    url = db.Column(db.String(2048))
     is_active = db.Column(db.Boolean, default=True)
+    documents = db.relationship('Document', backref='source')
 
     def __repr__(self):
         return '<Source {}>'.format(self.name)
 
     def __str__(self):
         return 'Source: {} --- {}'.format(self.id, self.name)
+
+
+class Document(db.Model):
+    __tablename__ = 'document'
+
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(1024), unique=True)
+    text = db.Column(db.Text())
+    url = db.Column(db.String(2048))  # TODO need url validator
+    created = db.Column(db.DateTime)
+    added = db.Column(db.DateTime, default=datetime.utcnow())
+    updated = db.Column(db.DateTime, onupdate=datetime.utcnow())
+    source_id = db.Column(db.Integer, db.ForeignKey('source.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))

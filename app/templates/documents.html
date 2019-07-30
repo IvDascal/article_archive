@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <a href="{{ url_for('document_create') }}">Create Document</a>
+    <ul>
+        {% for document in documents %}
+            <li>
+                <a href="{{ url_for('document', id=document.id) }}">{{ document.title }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}
