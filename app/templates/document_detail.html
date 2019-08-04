@@ -9,6 +9,10 @@
         <p>AUTHOR: {{ document.user.username }}</p>
         <p>TEXT: {{ document.text }}</p>
     </div>
-    <a href="{{ url_for('document_edit', id=document.id) }}">Edit</a>
-    <a href="{{ url_for('document_delete', id=document.id ) }}">Delete</a>
+    {% if current_user.is_admin or ( not current_user.is_admin and document.is_editable) %}
+        <a href="{{ url_for('document_edit', id=document.id) }}">Edit</a>
+    {% endif %}
+    {% if current_user.is_admin %}
+        <a href="{{ url_for('document_delete', id=document.id ) }}">Delete</a>
+    {% endif %}
 {% endblock %}

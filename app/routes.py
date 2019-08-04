@@ -1,4 +1,6 @@
-from flask import render_template, redirect, url_for, request, jsonify, g
+from datetime import timedelta, datetime
+
+from flask import render_template, redirect, url_for, request, jsonify, g, flash
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
@@ -288,6 +290,22 @@ def document_create():
 @login_required
 def document_edit(id):
     document = Document.query.get(id)
+
+    if not current_user.is_admin:
+        if not document.is_editable:
+            flash('Document is not editable')
+            return redirect(url_for('document', id=document.id))
+
+        if document.added < (datetime.utcnow() - timedelta(hours=1)):
+            document.is_editable = False
+
+            db.session.add(document)
+            db.session.commit()
+
+            flash('Document is not editable')
+
+            return redirect(url_for('document', id=document.id))
+
     form = DocumentEditForm(document=document)
 
     if form.validate_on_submit():

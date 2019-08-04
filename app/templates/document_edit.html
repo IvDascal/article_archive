@@ -21,7 +21,7 @@
         </p>
         <p>
             {{ form.created.label }}<br>
-            {{ form.created(size=64) }}<br>
+            {{ form.created(class='date-single-picker') }}<br>
             {% for error in form.created.errors %}
                 <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
