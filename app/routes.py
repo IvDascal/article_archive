@@ -1,21 +1,26 @@
-from flask import render_template, redirect, url_for, request, jsonify
-from flask_login import current_user, login_user, logout_user
+from flask import render_template, redirect, url_for, request, jsonify, g
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 
 from app import app, db
 from app.forms import LoginForm, UserCreateForm, UserEditForm, SourceCreateForm, SourceEditForm, DocumentEditForm, \
     DocumentCreateForm
 from app.models import User, Role, Source, Document
-from app.utils import date_bounds
+from app.utils import date_bounds, check_permission
+
+
+@app.before_request
+def before_request():
+    g.user = current_user
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/index', endpoint='index')
 def index():
     return render_template('index.html')
 
 
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/login', methods=['GET', 'POST'], endpoint='login')
 def login():
     if current_user.is_authenticated:
         return redirect(url_for('index'))
@@ -40,27 +45,34 @@ def login():
     return render_template('login.html', title='Sign In', form=form)
 
 
-@app.route('/logout')
+@app.route('/logout', endpoint='logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
 
 
-@app.route('/user/<int:id>')
+@app.route('/user/<int:id>', endpoint='user')
+@login_required
+@check_permission
 def user(id):
     user = User.query.get(id)
 
     return render_template('user_detail.html', user=user)
 
 
-@app.route('/users')
+@app.route('/users', endpoint='users')
+@login_required
+@check_permission
 def users():
     users = User.query.all()
 
     return render_template('users.html', users=users)
 
 
-@app.route('/create_user', methods=['GET', 'POST'])
+@app.route('/create_user', methods=['GET', 'POST'], endpoint='create_user')
+@login_required
+@check_permission
 def create_user():
     form = UserCreateForm()
     if form.validate_on_submit():
@@ -68,6 +80,7 @@ def create_user():
         user.username = form.username.data
         user.email = form.email.data
         user.password = form.password.data
+        user.is_admin = form.is_admin.data
         user.is_active = form.is_active.data
 
         role = Role.query.get(form.role.data)
@@ -81,7 +94,9 @@ def create_user():
     return render_template('create_user.html', form=form)
 
 
-@app.route('/edit_user/<int:id>', methods=['GET', 'POST'])
+@app.route('/edit_user/<int:id>', methods=['GET', 'POST'], endpoint='edit_user')
+@login_required
+@check_permission
 def edit_user(id):
     user = User.query.get(id)
     form = UserEditForm(user=user)
@@ -89,6 +104,7 @@ def edit_user(id):
     if form.validate_on_submit():
         user.username = form.username.data
         user.email = form.email.data
+        user.is_admin = form.is_admin.data
         user.is_active = form.is_active.data
         role = Role.query.get(form.role.data)
         user.role = role
@@ -100,12 +116,15 @@ def edit_user(id):
 
     form.email.data = user.email
     form.username.data = user.username
+    form.is_admin.data = user.is_admin
     form.role.data = user.role_id
 
     return render_template('edit_user.html', form=form)
 
 
-@app.route('/delete_user/<int:id>')
+@app.route('/delete_user/<int:id>', endpoint='delete_user')
+@login_required
+@check_permission
 def delete_user(id):
     user = User.query.get(id)
     user.is_active = False
@@ -119,21 +138,27 @@ def delete_user(id):
     return redirect(url_for('users'))
 
 
-@app.route('/source/<int:id>')
+@app.route('/source/<int:id>', endpoint='source')
+@login_required
+@check_permission
 def source(id):
     source = Source.query.get(id)
 
     return render_template('source_detail.html', source=source)
 
 
-@app.route('/sources')
+@app.route('/sources', endpoint='sources')
+@login_required
+@check_permission
 def sources():
     sources = Source.query.all()
 
     return render_template('sources.html', sources=sources)
 
 
-@app.route('/source_create', methods=['GET', 'POST'])
+@app.route('/source_create', methods=['GET', 'POST'], endpoint='source_create')
+@login_required
+@check_permission
 def source_create():
     form = SourceCreateForm()
     if form.validate_on_submit():
@@ -150,7 +175,9 @@ def source_create():
     return render_template('source_create.html', form=form)
 
 
-@app.route('/source_edit/<int:id>', methods=['GET', 'POST'])
+@app.route('/source_edit/<int:id>', methods=['GET', 'POST'], endpoint='source_edit')
+@login_required
+@check_permission
 def source_edit(id):
     source = Source.query.get(id)
     form = SourceEditForm(source=source)
@@ -172,7 +199,9 @@ def source_edit(id):
     return render_template('source_edit.html', form=form)
 
 
-@app.route('/source_delete/<int:id>')
+@app.route('/source_delete/<int:id>', endpoint='source_delete')
+@login_required
+@check_permission
 def source_delete(id):
     source = Source.query.get(id)
     source.is_active = False
@@ -186,14 +215,16 @@ def source_delete(id):
     return redirect(url_for('sources'))
 
 
-@app.route('/document/<int:id>')
+@app.route('/document/<int:id>', endpoint='document')
+@login_required
 def document(id):
     document = Document.query.get(id)
 
     return render_template('document_detail.html', document=document)
 
 
-@app.route('/documents')
+@app.route('/documents', endpoint='documents')
+@login_required
 def documents():
     source_id = request.args.get('source', None)
     user_id = request.args.get('user', None)
@@ -207,9 +238,7 @@ def documents():
         documents = documents.filter(Document.source_id == int(source_id))
 
     if user_id:
-        print(user_id)
         documents = documents.filter(Document.user_id == int(user_id))
-        print(documents)
 
     if created:
         start, end = date_bounds(created)
@@ -232,7 +261,8 @@ def documents():
     return render_template('documents.html', documents=documents)
 
 
-@app.route('/document_create', methods=['GET', 'POST'])
+@app.route('/document_create', methods=['GET', 'POST'], endpoint='document_create')
+@login_required
 def document_create():
     form = DocumentCreateForm()
     if form.validate_on_submit():
@@ -254,7 +284,8 @@ def document_create():
     return render_template('document_create.html', form=form)
 
 
-@app.route('/document_edit/<int:id>', methods=['GET', 'POST'])
+@app.route('/document_edit/<int:id>', methods=['GET', 'POST'], endpoint='document_edit')
+@login_required
 def document_edit(id):
     document = Document.query.get(id)
     form = DocumentEditForm(document=document)
@@ -284,7 +315,9 @@ def document_edit(id):
     return render_template('document_edit.html', form=form)
 
 
-@app.route('/document_delete/<int:id>')
+@app.route('/document_delete/<int:id>', endpoint='document_delete')
+@login_required
+@check_permission
 def document_delete(id):
     document = Document.query.get(id)
 
@@ -298,6 +331,7 @@ def document_delete(id):
 
 
 @app.route('/search_source')
+@login_required
 def search_source():
     search = request.args.get('search')
     search = '%{}%'.format(search)
@@ -316,10 +350,11 @@ def search_source():
 
 
 @app.route('/search_user')
+@login_required
 def search_user():
     search = request.args.get('search')
     search = '%{}%'.format(search)
-    print(search)
+
     users = User.query.filter(User.username.like(search)).all()
 
     results = []

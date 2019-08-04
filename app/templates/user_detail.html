@@ -4,6 +4,7 @@
     <div class="page-header">
         <h1>{{ user.username }}</h1>
         <p>Email: {{ user.email }}</p>
+        <p>Is user admin: {% if user.is_admin %} Yes {% else %} No {% endif %}</p>
         <p>Is user active: {% if user.is_active %} Yes {% else %} No {% endif %}</p>
         <p>Role: {{ user.role.name }}</p>
     </div>

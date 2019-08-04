@@ -17,6 +17,7 @@ class UserCreateForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired()])
     password2 = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    is_admin = BooleanField('Admin')
     is_active = BooleanField('Active', default="checked")
     role = SelectField('Role', coerce=int)
     submit = SubmitField('Create')
@@ -38,6 +39,7 @@ class UserEditForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     email = StringField('Email', validators=[DataRequired(), Email()])
     is_active = BooleanField('Active', default="checked")
+    is_admin = BooleanField('Admin')
     role = SelectField('Role', coerce=int)
     submit = SubmitField('Save')
 

@@ -4,6 +4,16 @@
     {% if title %}{{ title }} | ArticleArchive{% else %}ArticleArchive{% endif %}
 {% endblock %}
 
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    <ul class=flashes>
+    {% for message in messages %}
+      <li>{{ message }}</li>
+    {% endfor %}
+    </ul>
+  {% endif %}
+{% endwith %}
+
 {% block styles %}
     {{super()}}
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
@@ -26,14 +36,17 @@
             <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
                 <ul class="nav navbar-nav">
                     <li><a href="{{ url_for('index') }}">Home</a></li>
-                    <li><a href="{{ url_for('sources') }}">Sources</a></li>
+                    {% if current_user.is_admin %}
+                        <li><a href="{{ url_for('users') }}">Users</a></li>
+                        <li><a href="{{ url_for('sources') }}">Sources</a></li>
+                    {% endif %}
                     <li><a href="{{ url_for('documents') }}">Documents</a></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
                     {% if current_user.is_anonymous %}
                         <li><a href="{{ url_for('login') }}">Login</a></li>
                     {% else %}
-                        <li><a href="{{ url_for('user', id=current_user.id) }}">Profile</a></li>
+                        <li><a href="{{ url_for('user', id=current_user.id) }}">Profile ({{ current_user.username }})</a></li>
                         <li><a href="{{ url_for('logout') }}">Logout</a></li>
                     {% endif %}
                 </ul>
