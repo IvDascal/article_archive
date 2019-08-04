@@ -4,6 +4,14 @@
     {% if title %}{{ title }} | ArticleArchive{% else %}ArticleArchive{% endif %}
 {% endblock %}
 
+{% block styles %}
+    {{super()}}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/css/select2.min.css" rel="stylesheet" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <link href="{{url_for('static', filename='styles.css')}}" rel="stylesheet"/>
+{% endblock %}
+
 {% block navbar %}
     <nav class="navbar navbar-default">
         <div class="navbar-header">
@@ -48,41 +56,12 @@
     </div>
 {% endblock %}
 
-{#
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %} | ArticleArchive</title>
+{% block scripts %}
+    {{super()}}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.8/js/select2.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
 
-    {% block styles %}{% endblock %}
-</head>
-<body>
-    <div class="page-header">
-        {% block page_header %}
-
-            <div>
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('sources') }}">Sources</a>
-                <a href="{{ url_for('documents') }}">Documents</a>
-                {% if current_user.is_anonymous %}
-                    <a href="{{ url_for('login') }}">Login</a>
-                {% else %}
-                    <a href="{{ url_for('logout') }}">Logout ({{ current_user.username }})</a>
-                {% endif %}
-            </div>
-        {% endblock %}
-    </div>
-
-    <div class="page-content">
-        {% block content %}{% endblock %}
-    </div>
-
-    <div class="page-footer">
-
-    </div>
-
-    {% block scripts %} {% endblock %}
-</body>
-</html>
-#}
+    <script src="{{url_for('static', filename='filter.js')}}"></script>
+    <script src="{{url_for('static', filename='datePicker.js')}}"></script>
+{% endblock %}

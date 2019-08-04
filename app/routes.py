@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request
+from flask import render_template, redirect, url_for, request, jsonify
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
@@ -6,6 +6,7 @@ from app import app, db
 from app.forms import LoginForm, UserCreateForm, UserEditForm, SourceCreateForm, SourceEditForm, DocumentEditForm, \
     DocumentCreateForm
 from app.models import User, Role, Source, Document
+from app.utils import date_bounds
 
 
 @app.route('/')
@@ -194,7 +195,39 @@ def document(id):
 
 @app.route('/documents')
 def documents():
-    documents = Document.query.all()
+    source_id = request.args.get('source', None)
+    user_id = request.args.get('user', None)
+    created = request.args.get('created', None)
+    updated = request.args.get('updated', None)
+    article_title = request.args.get('title', None)
+    article_text = request.args.get('article_text', None)
+
+    documents = Document.query
+    if source_id:
+        documents = documents.filter(Document.source_id == int(source_id))
+
+    if user_id:
+        print(user_id)
+        documents = documents.filter(Document.user_id == int(user_id))
+        print(documents)
+
+    if created:
+        start, end = date_bounds(created)
+        if start and end:
+            documents = documents.filter(Document.created >= start, Document.created <= end)
+
+    if updated:
+        start, end = date_bounds(updated)
+        if start and end:
+            documents = documents.filter(Document.updated >= start, Document.updated <= end)
+
+    if article_title:
+        article_title = '%{}%'.format(article_title)
+        documents = documents.filter(Document.title.like(article_title))
+
+    if article_text:
+        article_text = '%{}%'.format(article_text)
+        documents = documents.filter(Document.title.like(article_text))
 
     return render_template('documents.html', documents=documents)
 
@@ -262,3 +295,39 @@ def document_delete(id):
     # TODO success or error message
 
     return redirect(url_for('documents'))
+
+
+@app.route('/search_source')
+def search_source():
+    search = request.args.get('search')
+    search = '%{}%'.format(search)
+
+    sources = Source.query.filter(Source.name.like(search)).all()
+
+    results = []
+    for source in sources:
+        results.append({
+            'id': source.id,
+            'title': source.name,
+            'selection_text': source.name
+        })
+
+    return jsonify({'results': results})
+
+
+@app.route('/search_user')
+def search_user():
+    search = request.args.get('search')
+    search = '%{}%'.format(search)
+    print(search)
+    users = User.query.filter(User.username.like(search)).all()
+
+    results = []
+    for user in users:
+        results.append({
+            'id': user.id,
+            'title': user.username,
+            'selection_text': user.username
+        })
+
+    return jsonify({'results': results})

@@ -1,0 +1,18 @@
+.filter-block {
+    float: left;
+    margin-right: 20px;
+    max-width: 100%;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 3px;
+    margin-bottom: 5px;
+}
+
+.date-range-picker {
+    width: 100%;
+}
+
+.text-search {
+    width: 100%;
+}

@@ -1,0 +1,53 @@
+<div>
+    <div>
+        <span>Filters</span>
+    </div>
+    <div>
+        <form method="GET" autocomplete="off">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="source">Source</label>
+                        <select class="source" id="source" name="source"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="created">Created</label><br>
+                        <input type="text" name="created" id="created" class="date-range-picker"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="created">Title</label><br>
+                        <input type="text" name="title" id="title" class="text-search"/>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="user">User</label>
+                        <select class="user" id="user" name="user"></select>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="created">Updated</label><br>
+                        <input type="text" name="updated" id="updated" class="date-range-picker"/>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-block">
+                        <label for="created">Article Text</label><br>
+                        <input type="text" name="article_text" id="article_text" class="text-search"/>
+                    </div>
+                </div>
+            </div>
+            <div class="clearfix"></div>
+            <div>
+                <button type="submit" class="btn btn-warning">Search</button>
+            </div>
+        </form>
+    </div>
+</div>

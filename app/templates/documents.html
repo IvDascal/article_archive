@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 
 {% block app_content %}
-    <a href="{{ url_for('document_create') }}">Create Document</a>
+    {% include "filters.html" %}
+
+    <a class="btn btn-primary" href="{{ url_for('document_create') }}">Create Document</a>
     <ul>
         {% for document in documents %}
             <li>
