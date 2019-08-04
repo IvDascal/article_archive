@@ -85,7 +85,7 @@ class Document(db.Model):
     created = db.Column(db.DateTime)
     added = db.Column(db.DateTime, default=datetime.utcnow())
     updated = db.Column(db.DateTime, onupdate=datetime.utcnow())
-
+    editing_amount = db.Column(db.Integer, default=0)
     is_editable = db.Column(db.Boolean, default=True)
 
     source_id = db.Column(db.Integer, db.ForeignKey('source.id'))

@@ -318,6 +318,11 @@ def document_edit(id):
         user = User.query.get(form.user.data)
         document.user = user
 
+        if not document.editing_amount:
+            document.editing_amount = 0
+
+        document.editing_amount += 1
+
         db.session.add(document)
         db.session.commit()
 
